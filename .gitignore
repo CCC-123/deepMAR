@@ -1,0 +1,13 @@
+checkpoint/
+checkpoint1/
+checkpoint2/
+checkpoint2.1/
+checkpoint3/
+checkpoint5/
+history/
+history1/
+data/
+temp1/
+
+*.pyc
+checkpoint_epoch_0
