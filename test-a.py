@@ -100,7 +100,7 @@ imgLoader = torch.utils.data.DataLoader(
 print len(set)
 
 
-path = "./checkpoint3/checkpoint_epoch_360" 
+path = "./checkpoint/checkpoint_epoch_90" 
 net = models.alexnet(num_classes=35)
 net.load_state_dict(torch.load(path))
 net.eval()

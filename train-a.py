@@ -108,9 +108,9 @@ imgLoader = torch.utils.data.DataLoader(
 print len(set)
 
 
-historyPath = "./checkpoint/checkpoint_epoch_480" 
+#historyPath = "./checkpoint/checkpoint_epoch_480" 
 net = models.alexnet(num_classes=35)
-net.load_state_dict(torch.load(historyPath))
+#net.load_state_dict(torch.load(historyPath))
 net.train()
 net.cuda()
 
@@ -127,7 +127,7 @@ weight = torch.Tensor([1.6577705942628165, 1.9569133706913606, 2.453397219303324
 criterion = nn.BCEWithLogitsLoss(weight = weight)
 criterion.cuda()
 
-optimizer = torch.optim.SGD(net.parameters(), lr=0.001, weight_decay=0.005)
+optimizer = torch.optim.SGD(net.parameters(), lr=0.001)
 
 running_loss = 0.0
 for epoch in range(1000):

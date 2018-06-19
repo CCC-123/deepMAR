@@ -75,6 +75,9 @@ def checkpoint(epoch):
     path = "./temp1/checkpoint_epoch_{}".format(epoch)
     torch.save(net.state_dict(),path)
 
+def weight_init(m):
+    if isinstance(m,nn.Conv2d):
+        nn.init.xavier_normal(m.weight.data)
 
 
 
@@ -83,9 +86,9 @@ def checkpoint(epoch):
 
 mytransform = transforms.Compose([
     transforms.RandomHorizontalFlip(),
-    transforms.Resize(256),
-    transforms.RandomCrop(227),
-    #transforms.Resize((299,299)),       #TODO:maybe need to change1
+    #transforms.Resize(256),
+    #transforms.RandomCrop(227),
+    transforms.Resize((227,227)),       #TODO:maybe need to change1
     transforms.ToTensor(),            # mmb,
     ]
 )
@@ -102,12 +105,15 @@ print len(set)
 
 net = models.alexnet(num_classes=26)
 
-net_dict = net.state_dict()
-path = "./checkpoint_epoch_0" 
+'''net_dict = net.state_dict()
+path = "./checkpoint_epoch_300" 
 pretrained_dict = torch.load(path)
 pretrained_dict = {k : v for k,v in pretrained_dict.items() if k in net_dict and pretrained_dict[k].size() == net_dict[k].size()}
 net_dict.update(pretrained_dict)
-net.load_state_dict(net_dict)  
+net.load_state_dict(net_dict) ''' 
+
+path = "./temp1/checkpoint_epoch_80"                     #FIXME:PATH
+net.load_state_dict(torch.load(path))
 
 
 
@@ -138,7 +144,7 @@ weight = torch.Tensor([1.7226262226969686, 2.6802565029531618, 1.068213364415483
 criterion = nn.BCEWithLogitsLoss(weight = weight)          #TODO:1.learn 2. weight
 criterion.cuda()
 
-optimizer = torch.optim.SGD(net.parameters(), lr=0.001)
+optimizer = torch.optim.Adam(net.parameters(), lr=0.00005)
 
 running_loss = 0.0
 for epoch in range(1000):
@@ -175,9 +181,10 @@ for epoch in range(1000):
                     name="1"
                 )
                 running_loss = 0.0
-    if epoch % 5 == 0:
+    if epoch % 20 == 0:
         checkpoint(epoch)
-        for param_group in optimizer.param_groups:
-            param_group['lr'] = param_group['lr'] * 0.95
+        '''for param_group in optimizer.param_groups:
+            param_group['lr'] = param_group['lr'] * 0.9'''
+
 
     

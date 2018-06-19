@@ -13,15 +13,11 @@ import torchvision.transforms as transforms
 import copy
 
 
-class_names = ['personalLess30','personalLess45','personalLess60','personalLarger60','carryingBackpack',
-                'carryingOther','lowerBodyCasual','upperBodyCasual','lowerBodyFormal','upperBodyFormal',
-                'accessoryHat','upperBodyJacket','lowerBodyJeans','footwearLeatherShoes','upperBodyLogo',
-                'hairLong','personalMale','carryingMessengerBag','accessoryMuffler','accessoryNothing',
-                'carryingNothing','upperBodyPlaid','carryingPlasticBags','footwearSandals','footwearShoes',
-                'lowerBodyShorts','upperBodyShortSleeve','lowerBodyShortSkirt','footwearSneakers','upperBodyThinStripes', #longskirt,thickstripe
-                'accessorySunglasses','lowerBodyTrousers','upperBodyTshirt','upperBodyOther','upperBodyVNeck']
-class_len = 35
 
+
+
+class_names = ['personalMale','personalLarger60','accessoryHat','carryingBackpack','upperBodyShortSleeve',
+                'upperBodyLogo','upperBodyPlaid','lowerBodyTrousers','lowerBodyShorts','lowerBodyShortSkirt','lowerBodyLongSkirt']  #last 2 overlap
 
 def default_loader(path):
     return Image.open(path).convert('RGB')
@@ -48,12 +44,14 @@ class myImageFloder(data.Dataset):
                                 att_vector.append(1)
                             else:
                                 att_vector.append(0)
-                        if dir == '3DPeS' or dir == 'TownCentre':                                   #sbname
+                        att_vector[0] = 1 - att_vector[0]           
+                        att_vector[9] = att_vector[9] or att_vector[10]                      #1. male<->female 2. skirt = short  +long
+                        if dir == '3DPeS' or dir == 'TownCentre':                                   #sbname_
                             for filename in os.listdir(root + '/' + dir + '/' +  'archive'):
                                 if filename.startswith(fn+'_'):
                                     att_vector.append(os.path.join(dir + '/'  +'archive', filename))
                                     #print(att_vector[35])
-                                    att_vector[35] = os.path.join(dir + '/'  +'archive', filename)
+                                    att_vector[11] = os.path.join(dir + '/'  +'archive', filename)
                                     #print(att_vector[35])
                                     temp_vector = copy.copy(att_vector)                           #nmb deep copy
                                     imgs.append((os.path.join(dir + '/'  +'archive', filename), temp_vector))
@@ -65,7 +63,7 @@ class myImageFloder(data.Dataset):
                         for filename in os.listdir(root + '/' + dir + '/' +  'archive'):
                             if filename.startswith(fn):
                                 att_vector.append(os.path.join(dir + '/'  +'archive', filename))
-                                att_vector[35] = os.path.join(dir + '/'  +'archive', filename)
+                                att_vector[11] = os.path.join(dir + '/'  +'archive', filename)
                                 #print(att_vector[35])
                                 temp_vector = copy.copy(att_vector)                           #nmb deep copy
                                 imgs.append((os.path.join(dir + '/'  +'archive', filename), temp_vector))
@@ -106,7 +104,7 @@ def imshow(imgs):
 
 mytransform = transforms.Compose([
     
-    transforms.CenterCrop(224),
+    #transforms.CenterCrop(224),
     transforms.ToTensor(),            # mmb
     ]
 )
@@ -126,31 +124,18 @@ images,labels = dataiter.next()
 print(labels)
 imshow(images)'''
 
-train = open("traindata.txt","w")
-val = open("valdata.txt","w")
-test = open("testdata.txt","w")
+
+test = open("generalizedata.txt","w")
 for i, data in enumerate(imgLoader, 0):
-    if i < 9500:
+    if i < 5000:
         # get the inputs
         inputs, labels = data
 
-        train.write(labels[35][0]+' ')
+        test.write(labels[11][0]+' ')
 
-        for j in range(35):
-            train.write(str(labels[j][0])+' ')
-        train.write('\n')
-    elif  i < 11400:
-        inputs, labels = data
-        val.write(labels[35][0]+' ')
-        for j in range(35):
-            val.write(str(labels[j][0])+' ')
-        val.write('\n')
-    else :
-        inputs, labels = data
-        test.write(labels[35][0]+' ')
-        for j in range(35):
+        for j in range(10):
             test.write(str(labels[j][0])+' ')
         test.write('\n')
-train.close()
-val.close()
+    else :
+        break;
 test.close()
